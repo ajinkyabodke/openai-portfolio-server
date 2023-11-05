@@ -13,13 +13,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize the OpenAI API client
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-console.log(process.env.OPENAI_API_KEY);
-
 // Define the route for text completion
 app.post("/complete-text", async (req, res) => {
+  // Initialize the OpenAI API client
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   // Extract the user input from the request query parameters
+
   const userInput = req.body;
   console.log("userInput", userInput);
 
