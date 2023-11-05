@@ -32,6 +32,13 @@ app.post("/complete-text", async (req, res) => {
   try {
     console.log("Sending prompt to OPENAI");
     const chatCompletionResponseAsJSON = await getOpenAIResponseNEW([
+      {
+        role: "system",
+        content: `
+- Follow user’s instructions to the point.
+- Convert user request to HTML + CSS, use inline css only.
+- Minimise any other prose.`,
+      },
       { role: "user", content: userInput.prompt },
     ]);
 
@@ -40,12 +47,11 @@ app.post("/complete-text", async (req, res) => {
     console.log("🟢 response from openai : ", chatCompletionResponseAsJSON);
 
     const output = chatCompletionResponseAsJSON?.choices[0].message?.content;
-    console.log("⚪️ output as html : ", output);
 
     // console.log("completion", completion);
 
     // Send the completion text back to the client
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, output });
   } catch (error) {
     console.error(error);
 
