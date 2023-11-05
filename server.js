@@ -2,6 +2,7 @@
 const express = require("express");
 
 const cors = require("cors");
+const { default: axios } = require("axios");
 require("dotenv").config();
 
 // Create an instance of the Express application
@@ -29,12 +30,13 @@ app.post("/complete-text", async (req, res) => {
   }
 
   try {
-    const chatCompletionResponse = await getOpenAIRespone([
+    console.log("Sending prompt to OPENAI");
+    const chatCompletionResponseAsJSON = await getOpenAIResponseNEW([
       { role: "user", content: userInput.prompt },
     ]);
 
     // Extract the completion text from the API response
-    const chatCompletionResponseAsJSON = await chatCompletionResponse.json();
+    // const chatCompletionResponseAsJSON = await chatCompletionResponse.json();
     console.log("🟢 response from openai : ", chatCompletionResponseAsJSON);
 
     const output = chatCompletionResponseAsJSON?.choices[0].message?.content;
@@ -56,8 +58,21 @@ app.post("/complete-text", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+const getOpenAIResponseNEW = async (messages) => {
+  const apiUrl = "https://api.openai.com/v1/chat/completions";
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + process.env.OPENAI_API_KEY,
+  };
 
-const getOpenAIRespone = (messages) =>
+  const data = {
+    model: "gpt-3.5-turbo",
+    messages,
+  };
+  const res = await axios.post(apiUrl, data, { headers });
+  return res.data;
+};
+const getOpenAIResponseOLD = (messages) =>
   fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
