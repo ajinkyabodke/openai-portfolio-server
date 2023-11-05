@@ -1,3 +1,4 @@
+// @ts-check
 const express = require("express");
 const OpenAI = require("openai");
 const cors = require("cors");
@@ -16,11 +17,11 @@ app.use(express.json());
 // Define the route for text completion
 app.post("/complete-text", async (req, res) => {
   // Initialize the OpenAI API client
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
   // Extract the user input from the request query parameters
 
   const userInput = req.body;
-  console.log("userInput", userInput);
 
   // Validate the user input
   if (!userInput) {
@@ -28,19 +29,21 @@ app.post("/complete-text", async (req, res) => {
   }
 
   try {
-    // Send a request to the OpenAI API to complete the text
-    const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: "user", content: userInput.prompt }],
-      model: "gpt-3.5-turbo",
-    });
+    const chatCompletionResponse = await getOpenAIRespone([
+      { role: "user", content: userInput.prompt },
+    ]);
 
     // Extract the completion text from the API response
-    const completion = chatCompletion?.choices?.[0].message?.content;
+    const chatCompletionResponseAsJSON = await chatCompletionResponse.json();
+    console.log("🟢 response from openai : ", chatCompletionResponseAsJSON);
 
-    console.log("completion", completion);
+    const output = chatCompletionResponseAsJSON?.choices[0].message?.content;
+    console.log("⚪️ output as html : ", output);
+
+    // console.log("completion", completion);
 
     // Send the completion text back to the client
-    res.json({ completion });
+    return res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);
 
@@ -53,3 +56,17 @@ app.post("/complete-text", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+const getOpenAIRespone = (messages) =>
+  fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + process.env.OPENAI_API_KEY,
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages,
+    }),
+  });
+// const myprompt = `Give me html and css Create a professional portfolio website with the following details:\nTemplate: Professional\nHeader Position: top\nInclude Photo: No\nProfessional Summary: \nExperience: \nEducation: \nSkills: \nContact: GitHub - , LinkedIn - , Twitter - \nColors: Primary - , Secondary - , Background - \nFont: \nFont Size: `
