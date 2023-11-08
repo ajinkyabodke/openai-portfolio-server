@@ -35,9 +35,11 @@ app.post("/complete-text", async (req, res) => {
       {
         role: "system",
         content: `
-- Follow user’s instructions to the point.
-- Convert user request to HTML + CSS, use inline css only.
-- Minimise any other prose.`,
+        - Convert user request using HTML and Tailwind CSS.
+        - Follow user’s instructions to the point.
+        - Do not start or end with any syntax, just give me the HTML that will go inside the <body> tag, but do NOT include <body> tag.
+        - Do not response with any other text or formatting (even markdown code-blocks) around the html (like \`\`\` html), only raw html.
+        - Use only tailwind classes, no custom classes or css.`,
       },
       { role: "user", content: userInput.prompt },
     ]);
@@ -47,11 +49,12 @@ app.post("/complete-text", async (req, res) => {
     console.log("🟢 response from openai : ", chatCompletionResponseAsJSON);
 
     const output = chatCompletionResponseAsJSON?.choices[0].message?.content;
+    const completeHtml = FIRST_PART_HTML + output + SECOND_PART_HTML;
 
     // console.log("completion", completion);
 
     // Send the completion text back to the client
-    return res.status(200).json({ success: true, output });
+    return res.status(200).json({ success: true, output: completeHtml });
   } catch (error) {
     console.error(error);
 
@@ -72,7 +75,7 @@ const getOpenAIResponseNEW = async (messages) => {
   };
 
   const data = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-4-1106-preview",
     messages,
   };
   const res = await axios.post(apiUrl, data, { headers });
@@ -91,3 +94,17 @@ const getOpenAIResponseOLD = (messages) =>
     }),
   });
 // const myprompt = `Give me html and css Create a professional portfolio website with the following details:\nTemplate: Professional\nHeader Position: top\nInclude Photo: No\nProfessional Summary: \nExperience: \nEducation: \nSkills: \nContact: GitHub - , LinkedIn - , Twitter - \nColors: Primary - , Secondary - , Background - \nFont: \nFont Size: `
+const FIRST_PART_HTML = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Folio</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+ 
+</head>
+
+<body>`;
+
+const SECOND_PART_HTML = `</body></html>`;
