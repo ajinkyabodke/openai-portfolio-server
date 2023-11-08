@@ -41,7 +41,7 @@ app.post("/complete-text", async (req, res) => {
         - Do not response with any other text or formatting (even markdown code-blocks) around the html (like \`\`\` html), only raw html.
         - Use only tailwind classes, no custom classes or css.`,
       },
-      { role: "user", content: userInput.prompt },
+      { role: "user", content: userInput.prompt+"\n keep the Main title black always!" },
     ]);
 
     // Extract the completion text from the API response
