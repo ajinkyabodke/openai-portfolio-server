@@ -1,4 +1,4 @@
-# Text Completion API (100xlabs)
+# Text Completion API 
 
 This is a simple Express.js server that interfaces with the OpenAI API to provide text completion functionality.
 
@@ -11,7 +11,7 @@ This is a simple Express.js server that interfaces with the OpenAI API to provid
 
 1. Clone the repository to your local machine.
 ```bash
-git clone https://github.com/Siddhant-Goswami/100xlabs-openai-nodejs-server.git
+git clone https://github.com/ajinkyabodke/openai-portfolio-server
 ```
 
 cd your-repo-name
